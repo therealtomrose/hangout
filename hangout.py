@@ -52,7 +52,14 @@ class Hangout():
 
     def maintain_hangout(self):
         while True:
-            tag = self.xpath_element(xpath='//div[contains(text(), "You left")]')
+            tag = self.xpath_element(
+                xpath='//div[contains(text(), "Yes")]',
+                wait_time=2)
+            if tag:
+                tag.click()
+            tag = self.xpath_element(
+                xpath='//div[contains(text(), "You left")]',
+                wait_time=2)
             if tag:
                 return None
 
