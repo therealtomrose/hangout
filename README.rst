@@ -36,6 +36,7 @@ Do this where the project will live e.g. 'testive'
 - configure the local python path::
 
     echo 'export PYTHONPATH=$PYTHONPATH:~/projects/hangout' >> ~/projects/hangout/bin/activate
+    echo 'export PATH=~/projects/hangout:$PATH' >> ~/projects/hangout/bin/activate
 
 
 Install requirements
@@ -46,7 +47,7 @@ Install requirements
     cd ~/projects/hangout
     source bin/activate
     sudo pip install -r requirements.txt
-    
+
 
 Running
 =======
@@ -59,8 +60,8 @@ Load Virtual Environment
 
     cd ~/projects/testive
     source bin/activate
-    
-    
+
+
 Run Hangout
 -----------
 
