@@ -19,7 +19,6 @@ class Hangout():
         self.user_email = settings.HANGOUT_USER_EMAIL
         self.user_pass = settings.HANGOUT_USER_PASS
         self.driver = webdriver.Chrome()
-        print dir(self.driver)
         self.driver.set_window_size(1024, 600)
         self.driver.maximize_window()
         self.wait = WebDriverWait(self.driver, 20)
@@ -124,7 +123,6 @@ class Hangout():
                 self.reset()
             if self._hangout_missing():
                 self.reset()
-            print self.driver.session_id
 
 
 if __name__ == '__main__':
