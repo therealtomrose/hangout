@@ -89,23 +89,27 @@ class Hangout():
             xpath='//div[contains(text(), "Yes")]',
             wait_time=2)
         if tag:
+            print '"Are you still there?": ', datetime.now()
             tag.click()
 
-    def _you_left_the_hangout(self):
+    def _handle_you_left_the_hangout(self):
         tag = self.xpath_element_is_visible(
             xpath='//div[contains(text(), "You left")]',
             wait_time=2)
         if tag:
-            return True
+            print '"You left the hangout": ', datetime.now()
+            self._reset()
 
-    def _found_error(self):
+    def _handle_found_error(self):
         tag = self.xpath_element_is_visible(
             xpath='//div[contains(text(), "Error")]',
             wait_time=2)
         if tag:
-            return True
+            print 'Error detected: ', datetime.now()
+            time.sleep(30)
+            self._reset()
 
-    def _hangout_missing(self):
+    def _handle_hangout_missing(self):
         tag = self.xpath_element_exists(
             xpath='//div[contains(text(), "Invite people")]',
             wait_time=5)
@@ -113,19 +117,22 @@ class Hangout():
             print 'Hangout is alive: ', datetime.now()
             return False
         else:
+            self._reset()
+
+    def _browser_is_open(self):
+        if self.driver.get_window_position():
             return True
+        else:
+            # This case causes an un-handle-able error from selenium
+            return False
 
     def run(self):
         self._setUp()
-        while True:
+        while self._browser_is_open():
             self._handle_are_you_still_there()
-            if self._you_left_the_hangout():
-                self._reset()
-            if self._found_error():
-                time.sleep(30)
-                self._reset()
-            if self._hangout_missing():
-                self._reset()
+            self._handle_you_left_the_hangout()
+            self._handle_found_error()
+            self._handle_hangout_missing()
 
 
 if __name__ == '__main__':
