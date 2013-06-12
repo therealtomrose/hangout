@@ -18,9 +18,7 @@ class Hangout():
         self.url = settings.HANGOUT_URL
         self.user_email = settings.HANGOUT_USER_EMAIL
         self.user_pass = settings.HANGOUT_USER_PASS
-        self.driver = webdriver.Chrome()
-        self.driver.set_window_size(1024, 600)
-        self.driver.maximize_window()
+        self._getNewDriver()
         self.wait = WebDriverWait(self.driver, 20)
 
     def xpath_element_is_visible(self, xpath=None, wait_time=10):
@@ -58,7 +56,7 @@ class Hangout():
                 pass
         return None
 
-    def setUp(self):
+    def _setUp(self):
         self.driver.get(self.url)
         element = self.css_element('input#Email')
         if element:
@@ -73,13 +71,18 @@ class Hangout():
         if element:
             element.click()
 
-    def tearDown(self):
-        return True
-        # self.driver.quit()
+    def _tearDown(self):
+        self.driver.close()
 
-    def reset(self):
-        self.tearDown()
-        self.setUp()
+    def _getNewDriver(self):
+        self.driver = webdriver.Chrome()
+        self.driver.set_window_size(1024, 600)
+        self.driver.maximize_window()
+
+    def _reset(self):
+        self._tearDown()
+        self._getNewDriver()
+        self._setUp()
 
     def _handle_are_you_still_there(self):
         tag = self.xpath_element_is_visible(
@@ -113,16 +116,16 @@ class Hangout():
             return True
 
     def run(self):
-        self.setUp()
+        self._setUp()
         while True:
             self._handle_are_you_still_there()
             if self._you_left_the_hangout():
-                self.reset()
+                self._reset()
             if self._found_error():
                 time.sleep(30)
-                self.reset()
+                self._reset()
             if self._hangout_missing():
-                self.reset()
+                self._reset()
 
 
 if __name__ == '__main__':
