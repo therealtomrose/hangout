@@ -86,7 +86,7 @@ class Hangout():
 
     def _handle_are_you_still_there(self):
         tag = self.xpath_element_is_visible(
-            xpath='//div[contains(text(), "Yes")]',
+            xpath='//span[contains(text(), "Yes")]',
             wait_time=2)
         if tag:
             print '"Are you still there?": ', datetime.now()
