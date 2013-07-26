@@ -117,6 +117,7 @@ class Hangout():
             # print 'Hangout is alive: ', datetime.now()
             return False
         else:
+            print 'Hangout missing: ', datetime.now()
             self._reset()
 
     def _browser_is_open(self):
@@ -133,9 +134,6 @@ class Hangout():
             self._handle_you_left_the_hangout()
             self._handle_found_error()
             self._handle_hangout_missing()
-
-            print dir(self.driver)
-            print self.driver.window_handles
 
 
 if __name__ == '__main__':
