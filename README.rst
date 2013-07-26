@@ -14,6 +14,18 @@ python
 Make sure you are running python 2.7: http://www.python.org/download
 
 
+Clone Testive git repo
+======================
+
+
+- Make a directory where you will store hangout (suggestions below)::
+
+    mkdir ~/projects
+    mkdir ~/projects/hangout
+    cd ~/projects
+    git clone https://github.com/therealtomrose/hangout.git hangout
+
+
 Setup Virtual Env
 =================
 
@@ -47,6 +59,16 @@ Install requirements
     cd ~/projects/hangout
     source bin/activate
     sudo pip install -r requirements.txt
+
+
+Configure Settings
+==================
+
+- Make a copy of the settings template file and enter your local settings.
+- To get the URI of a persistant google hangout, create a virtual event far in the future in google plus, then get the associated hangout address.
+
+    cd ~/projects/hangout
+    cp settings_local.template settings_local.py
 
 
 Running

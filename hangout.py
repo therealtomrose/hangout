@@ -72,7 +72,7 @@ class Hangout():
             element.click()
 
     def _tearDown(self):
-        self.driver.close()
+        self.driver.quit()
 
     def _getNewDriver(self):
         self.driver = webdriver.Chrome()
@@ -114,7 +114,7 @@ class Hangout():
             xpath='//div[contains(text(), "Invite people")]',
             wait_time=5)
         if tag:
-            print 'Hangout is alive: ', datetime.now()
+            # print 'Hangout is alive: ', datetime.now()
             return False
         else:
             self._reset()
@@ -128,11 +128,14 @@ class Hangout():
 
     def run(self):
         self._setUp()
-        while self._browser_is_open():
+        while True:
             self._handle_are_you_still_there()
             self._handle_you_left_the_hangout()
             self._handle_found_error()
             self._handle_hangout_missing()
+
+            print dir(self.driver)
+            print self.driver.window_handles
 
 
 if __name__ == '__main__':
