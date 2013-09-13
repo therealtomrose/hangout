@@ -9,6 +9,7 @@ from datetime import timedelta
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 import settings_local as settings
 
@@ -58,6 +59,10 @@ class Hangout():
 
     def _setUp(self):
         self.driver.get(self.url)
+
+        hangout_link = self.css_element('a.btn-large')
+        self.driver.get(hangout_link.get_attribute("href"))
+
         element = self.css_element('input#Email')
         if element:
             element.send_keys(self.user_email)
