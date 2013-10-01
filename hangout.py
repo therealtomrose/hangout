@@ -18,6 +18,7 @@ class Hangout():
         self.url = settings.HANGOUT_URL
         self.user_email = settings.HANGOUT_USER_EMAIL
         self.user_pass = settings.HANGOUT_USER_PASS
+        self.screen_width = settings.SCREEN_WIDTH
         self._getNewDriver()
         self.wait = WebDriverWait(self.driver, 20)
 
@@ -87,7 +88,7 @@ class Hangout():
 
     def _getNewDriver(self):
         self.driver = webdriver.Chrome()
-        self.driver.set_window_size(1024, 600)
+        self.driver.set_window_size(self.screen_width, 600)
         self.driver.maximize_window()
 
     def _reset(self):

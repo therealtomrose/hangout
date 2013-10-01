@@ -1,3 +1,8 @@
+"""A local settings file. Copy this file to settings_local.py and modify
+with your personal settings."""
+
+# To get a hangout URL, go to http://unhangout.media.mit.edu/h/
 HANGOUT_URL = ''
 HANGOUT_USER_EMAIL = ''
 HANGOUT_USER_PASS = ''
+SCREEN_WIDTH = 1200
