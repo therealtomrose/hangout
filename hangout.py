@@ -77,11 +77,13 @@ class Hangout():
             element.click()
 
         try:
-            hangout.driver.switch_to_window(hangout.driver.window_handles[1])
+            self.driver.switch_to_window(self.driver.window_handles[1])
         except IndexError:
             pass  # google hangout opened in the same tab
 
         self._handle_unbounce_continue(wait_time=10)
+
+        self._handle_unbounce_hide(wait_time=10)
 
     def _tearDown(self):
         self.driver.quit()
@@ -95,6 +97,11 @@ class Hangout():
         self._tearDown()
         self._getNewDriver()
         self._setUp()
+
+    def _handle_unbounce_hide(self, wait_time=2):
+        element = self.css_element('div.hide')
+        if element:
+            element.click()
 
     def _handle_unbounce_continue(self, wait_time=2):
         tag = self.xpath_element_is_visible(
