@@ -9,7 +9,6 @@ from datetime import timedelta
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 
 import settings_local as settings
 
@@ -76,6 +75,13 @@ class Hangout():
         if element:
             element.click()
 
+        try:
+            hangout.driver.switch_to_window(hangout.driver.window_handles[1])
+        except IndexError:
+            pass  # google hangout opened in the same tab
+
+        self._handle_unbounce_continue(wait_time=10)
+
     def _tearDown(self):
         self.driver.quit()
 
@@ -88,6 +94,14 @@ class Hangout():
         self._tearDown()
         self._getNewDriver()
         self._setUp()
+
+    def _handle_unbounce_continue(self, wait_time=2):
+        tag = self.xpath_element_is_visible(
+            xpath='//div[contains(text(), "Continue")]',
+            wait_time=wait_time)
+        if tag:
+            print '"Unhangout Supervisor needs your permission in order to start.": ', datetime.now()
+            tag.click()
 
     def _handle_are_you_still_there(self):
         tag = self.xpath_element_is_visible(
@@ -136,6 +150,7 @@ class Hangout():
         self._setUp()
         while True:
             self._handle_are_you_still_there()
+            self._handle_unbounce_continue()
             self._handle_you_left_the_hangout()
             self._handle_found_error()
             self._handle_hangout_missing()
