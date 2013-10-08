@@ -1,7 +1,7 @@
 hangout
 =======
 
-A persistant hangout for our remote office.
+A script for maintaining persistant google hangouts. (We use this for connecting a remote office.)
 
 
 Requirements
@@ -14,8 +14,19 @@ python
 Make sure you are running python 2.7: http://www.python.org/download
 
 
-Clone Testive git repo
-======================
+unhangout
+---------
+
+Create an unhangout conference room at http://unhangout.media.mit.edu/h/
+
+git
+---
+
+Make sure you have git http://git-scm.com/
+
+
+Clone git repo
+==============
 
 
 - Make a directory where you will store hangout (suggestions below)::
@@ -33,7 +44,7 @@ Setup Virtual Env
 Create virtual environment
 --------------------------
 
-Do this where the project will live e.g. 'testive'
+Do this where the project will live e.g. 'hangout'
 - install virtualenv::
 
     sudo easy_install pip
@@ -54,7 +65,7 @@ Do this where the project will live e.g. 'testive'
 Install requirements
 --------------------
 
-- Run the pip installer with a requirements file. (Look in ~/projects/testive/conf for a requirements file that matches your hardware)::
+- Run the pip installer with a requirements file.::
 
     cd ~/projects/hangout
     source bin/activate
@@ -80,7 +91,7 @@ Load Virtual Environment
 
 ::
 
-    cd ~/projects/testive
+    cd ~/projects/hangout
     source bin/activate
 
 
