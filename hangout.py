@@ -60,9 +60,9 @@ class Hangout():
     def _setUp(self):
         self.driver.get(self.url)
 
-        hangout_link = self.css_element('a.btn-large')
-        self.driver.get(hangout_link.get_attribute("href"))
-
+        element = self.css_element('a.btn-large')
+        if element:
+            self.driver.get(element.get_attribute("href"))
         element = self.css_element('input#Email')
         if element:
             element.send_keys(self.user_email)
