@@ -72,7 +72,7 @@ class Hangout():
         element = self.css_element('input#signIn')
         if element:
             element.click()
-        element = self.xpath_element_is_visible(xpath='//div[contains(text(), "Skip for now")]')
+        element = self.css_element('input[value="Skip for now"]')
         if element:
             element.click()
         element = self.xpath_element_is_visible(xpath='//div[contains(text(), "Join")]')
@@ -84,9 +84,10 @@ class Hangout():
         except IndexError:
             pass  # google hangout opened in the same tab
 
-        self._handle_unbounce_continue(wait_time=10)
-
+        self._handle_add_people_to_this_video_call(wait_time=15)
+        self._handle_unbounce_continue()
         self._handle_unbounce_hide(wait_time=10)
+        print 'New hangout established: ', datetime.now()
 
     def _tearDown(self):
         self.driver.quit()
@@ -101,10 +102,23 @@ class Hangout():
         self._getNewDriver()
         self._setUp()
 
+    def _handle_add_people_to_this_video_call(self, wait_time=2):
+        add_people_tag = self.xpath_element_is_visible(
+            xpath='//h1[contains(text(), "Add people")]',
+            wait_time=wait_time)
+        submit_tag = self.xpath_element_is_visible(
+            xpath='//div[contains(text(), "Submit")]',
+            wait_time=3)
+        if (add_people_tag and submit_tag):
+            submit_tag.click()
+
     def _handle_unbounce_hide(self, wait_time=2):
+        iframe = self.driver.find_elements_by_tag_name('iframe')[1]
+        self.driver.switch_to_frame(iframe)
         element = self.css_element('div.hide')
         if element:
             element.click()
+        hangout.driver.switch_to_default_content()
 
     def _handle_unbounce_continue(self, wait_time=2):
         tag = self.xpath_element_is_visible(
