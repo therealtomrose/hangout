@@ -72,6 +72,9 @@ class Hangout():
         element = self.css_element('input#signIn')
         if element:
             element.click()
+        element = self.xpath_element_is_visible(xpath='//div[contains(text(), "Skip for now")]')
+        if element:
+            element.click()
         element = self.xpath_element_is_visible(xpath='//div[contains(text(), "Join")]')
         if element:
             element.click()
