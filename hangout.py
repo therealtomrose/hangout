@@ -2,6 +2,7 @@
 """
 
 import time
+import selenium
 
 from datetime import datetime
 from datetime import timedelta
@@ -23,6 +24,8 @@ class Hangout():
         self.wait = WebDriverWait(self.driver, 20)
 
     def xpath_element_is_visible(self, xpath=None, wait_time=10):
+        """A custom handler for finding visible elements using xpath that
+        doesn't fail while the dom is still loading"""
         start_time = datetime.now()
         while datetime.now() < start_time + timedelta(seconds=wait_time):
             element = None
@@ -35,6 +38,8 @@ class Hangout():
         return None
 
     def xpath_element_exists(self, xpath=None, wait_time=10):
+        """A custom handler for finding existing elements using xpath that
+        doesn't fail while the dom is still loading"""
         start_time = datetime.now()
         while datetime.now() < start_time + timedelta(seconds=wait_time):
             element = None
@@ -47,6 +52,8 @@ class Hangout():
         return None
 
     def css_element(self, element=None, wait_time=10):
+        """A custom handler for finding elements using css that
+        doesn't fail while the dom is still loading"""
         start_time = datetime.now()
         while datetime.now() < start_time + timedelta(seconds=wait_time):
             try:
@@ -58,6 +65,7 @@ class Hangout():
         return None
 
     def _setUp(self):
+        """Start a google hangout session. This is a cascade of events."""
         self.driver.get(self.url)
 
         element = self.css_element('a.btn-large')
@@ -75,9 +83,8 @@ class Hangout():
         element = self.css_element('input[value="Skip for now"]')
         if element:
             element.click()
-        element = self.xpath_element_is_visible(xpath='//div[contains(text(), "Join")]')
-        if element:
-            element.click()
+
+        self._handle_join(wait_time=10)
 
         try:
             self.driver.switch_to_window(self.driver.window_handles[1])
@@ -90,6 +97,7 @@ class Hangout():
         print 'New hangout established: ', datetime.now()
 
     def _tearDown(self):
+        """Destroy the current browser session"""
         self.driver.quit()
 
     def _getNewDriver(self):
@@ -101,6 +109,19 @@ class Hangout():
         self._tearDown()
         self._getNewDriver()
         self._setUp()
+
+    def _handle_join(self, wait_time=2):
+        element = self.xpath_element_is_visible(
+            xpath='//div[contains(text(), "Join")]')
+        if element:
+            # For some reason, selenium things the join button is visible,
+            # when it is really not yet, so we have a work around here
+            try:
+                element.click()
+            except selenium.common.exceptions.WebDriverException:
+                # Join not clickable yet
+                time.sleep(1)
+                self._handle_join(wait_time=wait_time)
 
     def _handle_add_people_to_this_video_call(self, wait_time=2):
         add_people_tag = self.xpath_element_is_visible(
@@ -155,7 +176,7 @@ class Hangout():
 
     def _handle_hangout_missing(self):
         tag = self.xpath_element_exists(
-            xpath='//div[contains(text(), "Invite people")]',
+            xpath='//div[contains(text(), "Chat")]',
             wait_time=5)
         if tag:
             # print 'Hangout is alive: ', datetime.now()
