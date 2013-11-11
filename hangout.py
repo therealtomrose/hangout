@@ -3,6 +3,7 @@
 
 import time
 import selenium
+import urllib2
 
 from datetime import datetime
 from datetime import timedelta
@@ -86,10 +87,11 @@ class Hangout():
 
         self._handle_join(wait_time=10)
 
-        try:
-            self.driver.switch_to_window(self.driver.window_handles[1])
-        except IndexError:
-            pass  # google hangout opened in the same tab
+        # Deprecated???
+        # try:
+        #     self.driver.switch_to_window(self.driver.window_handles[1])
+        # except IndexError:
+        #     pass  # google hangout opened in the same tab
 
         self._handle_add_people_to_this_video_call(wait_time=15)
         self._handle_unbounce_continue()
@@ -98,7 +100,11 @@ class Hangout():
 
     def _tearDown(self):
         """Destroy the current browser session"""
-        self.driver.quit()
+        try:
+            self.driver.quit()
+        except urllib2.URLError:
+            # Not sure what use-case triggers this error. It happens overnight.
+            print 'urllib2.URLError: ', datetime.now()
 
     def _getNewDriver(self):
         self.driver = webdriver.Chrome()
@@ -134,7 +140,10 @@ class Hangout():
             submit_tag.click()
 
     def _handle_unbounce_hide(self, wait_time=2):
-        iframe = self.driver.find_elements_by_tag_name('iframe')[1]
+        try:
+            iframe = self.driver.find_elements_by_tag_name('iframe')[1]
+        except IndexError:
+            pass  # There is no iframe on this page
         self.driver.switch_to_frame(iframe)
         element = self.css_element('div.hide')
         if element:
