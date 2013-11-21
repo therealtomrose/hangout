@@ -142,9 +142,9 @@ class Hangout():
     def _handle_unbounce_hide(self, wait_time=2):
         try:
             iframe = self.driver.find_elements_by_tag_name('iframe')[1]
+            self.driver.switch_to_frame(iframe)
         except IndexError:
             pass  # There is no iframe on this page
-        self.driver.switch_to_frame(iframe)
         element = self.css_element('div.hide')
         if element:
             element.click()
