@@ -65,38 +65,43 @@ class Hangout():
                 pass
         return None
 
+    def css_element_if_displayed(self, element=None):
+        """A custom handler for returning only css elements that are visible"""
+        try:
+            element = self.driver.find_element_by_css_selector(element)
+            if element.is_displayed():
+                return element
+        except:  # Probably can't find the element
+            pass
+        return None
+
+    def xpath_element_if_displayed(self, xpath=None):
+        """A custom handler for returning only xpath elements that are visible"""
+        try:
+            element = self.driver.find_element(by=By.XPATH, value=xpath)
+            if element.is_displayed():
+                return element
+        except:  # Probably can't find the element
+            pass
+        return None
+
     def _setUp(self):
-        """Start a google hangout session. This is a cascade of events."""
+        """Start a google hangout session. This is a list of possible events."""
         self.driver.get(self.url)
-
-        element = self.css_element('a.btn-large')
-        if element:
-            self.driver.get(element.get_attribute("href"))
-        element = self.css_element('input#Email')
-        if element:
-            element.send_keys(self.user_email)
-        element = self.css_element('input#Passwd')
-        if element:
-            element.send_keys(self.user_pass)
-        element = self.css_element('input#signIn')
-        if element:
-            element.click()
-        element = self.css_element('input[value="Skip for now"]')
-        if element:
-            element.click()
-
-        self._handle_join(wait_time=10)
-
-        # Deprecated???
-        # try:
-        #     self.driver.switch_to_window(self.driver.window_handles[1])
-        # except IndexError:
-        #     pass  # google hangout opened in the same tab
-
-        self._handle_add_people_to_this_video_call(wait_time=15)
-        self._handle_unbounce_continue()
-        self._handle_unbounce_hide(wait_time=10)
-        print 'New hangout established: ', datetime.now()
+        while True:
+            self._handle_join_hangout()
+            self._handle_google_input_email()
+            self._handle_google_input_password()
+            self._handle_google_signin()
+            self._handle_invite_others()
+            self._handle_join()
+            self._handle_add_people_to_this_video_call()
+            self._handle_unbounce_continue()
+            self._handle_request_for_permission()
+            if self._hangout_is_alive():
+                print 'New hangout established: ', datetime.now()
+                return None
+        return None
 
     def _tearDown(self):
         """Destroy the current browser session"""
@@ -116,8 +121,38 @@ class Hangout():
         self._getNewDriver()
         self._setUp()
 
-    def _handle_join(self, wait_time=2):
-        element = self.xpath_element_is_visible(
+    def _handle_join_hangout(self):
+        """Press the Unhanogut conference room button 'JOIN HANGOUT' """
+        element = self.css_element_if_displayed('a.btn-large')
+        if element:
+            self.driver.get(element.get_attribute("href"))
+
+    def _handle_google_input_email(self):
+        """Input email into the Google login"""
+        element = self.css_element_if_displayed('input#Email')
+        if element:
+            element.send_keys(self.user_email)
+
+    def _handle_google_input_password(self):
+        """Input password into the Google login"""
+        element = self.css_element_if_displayed('input#Passwd')
+        if element:
+            element.send_keys(self.user_pass)
+
+    def _handle_google_signin(self):
+        """Click the 'Sign In' button on the Google login"""
+        element = self.css_element_if_displayed('input#signIn')
+        if element:
+            element.click()
+
+    def _handle_invite_others(self):
+        """Skip the option to invite others to the google hangout"""
+        element = self.css_element_if_displayed('input[value="Skip for now"]')
+        if element:
+            element.click()
+
+    def _handle_join(self):
+        element = self.xpath_element_if_displayed(
             xpath='//div[contains(text(), "Join")]')
         if element:
             # For some reason, selenium things the join button is visible,
@@ -126,34 +161,28 @@ class Hangout():
                 element.click()
             except selenium.common.exceptions.WebDriverException:
                 # Join not clickable yet
-                time.sleep(1)
-                self._handle_join(wait_time=wait_time)
+                pass
 
-    def _handle_add_people_to_this_video_call(self, wait_time=2):
-        add_people_tag = self.xpath_element_is_visible(
-            xpath='//h1[contains(text(), "Add people")]',
-            wait_time=wait_time)
-        submit_tag = self.xpath_element_is_visible(
-            xpath='//div[contains(text(), "Submit")]',
-            wait_time=3)
+    def _handle_add_people_to_this_video_call(self):
+        add_people_tag = self.xpath_element_if_displayed(
+            xpath='//h1[contains(text(), "Add people")]')
+        submit_tag = self.xpath_element_if_displayed(
+            xpath='//div[contains(text(), "Submit")]')
         if (add_people_tag and submit_tag):
             submit_tag.click()
 
-    def _handle_unbounce_hide(self, wait_time=2):
-        try:
-            iframe = self.driver.find_elements_by_tag_name('iframe')[1]
-            self.driver.switch_to_frame(iframe)
-        except IndexError:
-            pass  # There is no iframe on this page
-        element = self.css_element('div.hide')
-        if element:
-            element.click()
-        hangout.driver.switch_to_default_content()
+    def _handle_request_for_permission(self):
+        """Grant permission to unhangout supervisor if this is the first time
+        using it"""
+        for handle in self.driver.window_handles:
+            self.driver.switch_to_window(handle)
+            element = self.css_element_if_displayed('button#submit_approve_access')
+            if element:
+                element.click()
 
     def _handle_unbounce_continue(self, wait_time=2):
-        tag = self.xpath_element_is_visible(
-            xpath='//div[contains(text(), "Continue")]',
-            wait_time=wait_time)
+        tag = self.xpath_element_if_displayed(
+            xpath='//div[contains(text(), "Continue")]')
         if tag:
             print '"Unhangout Supervisor needs your permission in order to start.": ', datetime.now()
             tag.click()
@@ -183,14 +212,21 @@ class Hangout():
             time.sleep(30)
             self._reset()
 
+    def _hangout_is_alive(self):
+        """Returns True if the hangout is open and active."""
+        try:
+            element = self.driver.find_element(
+                by=By.XPATH,
+                value='//div[contains(text(), "Chat")]')
+            if element:
+                return True
+        except:  # Probably can't find the element
+            pass
+        return False
+
     def _handle_hangout_missing(self):
-        tag = self.xpath_element_exists(
-            xpath='//div[contains(text(), "Chat")]',
-            wait_time=5)
-        if tag:
-            # print 'Hangout is alive: ', datetime.now()
-            return False
-        else:
+        """Reset the Hangout if the hangout is missing."""
+        if not self._hangout_is_alive():
             print 'Hangout missing: ', datetime.now()
             self._reset()
 
@@ -204,6 +240,7 @@ class Hangout():
     def run(self):
         self._setUp()
         while True:
+            self._handle_join()
             self._handle_are_you_still_there()
             self._handle_unbounce_continue()
             self._handle_you_left_the_hangout()
