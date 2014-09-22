@@ -53,13 +53,13 @@ Do this where the project will live e.g. 'hangout'
 - install a new virtual environment in the directory where the project will live::
 
     cd ~/projects
-    virtualenv --no-site-packages hangout
+    virtualenv --no-site-packages hangout/venv
     sudo pip install -U versiontools
 
 - configure the local python path::
 
-    echo 'export PYTHONPATH=$PYTHONPATH:~/projects/hangout' >> ~/projects/hangout/bin/activate
-    echo 'export PATH=~/projects/hangout:$PATH' >> ~/projects/hangout/bin/activate
+    echo 'export PYTHONPATH=$PYTHONPATH:~/projects/hangout' >> ~/projects/hangout/vevn/bin/activate
+    echo 'export PATH=~/projects/hangout:$PATH' >> ~/projects/hangout/venv/bin/activate
 
 
 Install requirements
@@ -75,8 +75,7 @@ Install requirements
 Configure Settings
 ==================
 
-- Make a copy of the settings template file and enter your local settings.
-- To get the URI of a persistant google hangout, create a virtual event far in the future in google plus, then get the associated hangout address.
+- Make a copy of the settings template file and enter your local settings.::
 
     cd ~/projects/hangout
     cp settings_local.template settings_local.py
