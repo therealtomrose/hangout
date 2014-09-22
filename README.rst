@@ -91,7 +91,7 @@ Load Virtual Environment
 ::
 
     cd ~/projects/hangout
-    source bin/activate
+    source venv/bin/activate
 
 
 Run Hangout
